@@ -1,62 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunset IPTV Web Player</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sunset IPTV - Xtream Player</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <!-- HLS.js for Live TV & Stream Compatibility -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-    <header class="top-navbar">
-        <div class="brand-container">
-            <div class="brand-logo"><i class="fa-solid fa-sun"></i></div>
-            <div class="brand-title">SUNSET IPTV</div>
-        </div>
-        <div class="search-bar">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="masterSearch" placeholder="Search streams...">
-        </div>
-        <div class="top-actions">
-            <button class="btn-icon" id="btnRefresh" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
-            <button class="btn-icon" id="btnSettings" title="Settings"><i class="fa-solid fa-gear"></i></button>
-            <button class="btn-icon" id="btnLogin" title="Account Login"><i class="fa-solid fa-user"></i></button>
-        </div>
-    </header>
 
-    <div class="app-body">
-        <nav class="navigation-tabs">
-            <div class="nav-tab active" data-tab="live"><i class="fa-solid fa-tv"></i><span>Live TV</span></div>
-            <div class="nav-tab" data-tab="movies"><i class="fa-solid fa-film"></i><span>Movies</span></div>
-            <div class="nav-tab" data-tab="series"><i class="fa-solid fa-clapperboard"></i><span>Series</span></div>
-        </nav>
-
-        <aside class="category-sidebar">
-            <div class="sidebar-header">Categories</div>
-            <div class="category-list" id="categoryList"></div>
-        </aside>
-
-        <main class="content-area">
-            <div class="player-view" id="playerView">
-                <div class="video-container">
-                    <video id="videoPlayer" controls autoplay></video>
-                    <div class="player-overlay">
-                        <i class="fa-solid fa-circle-play" style="color: var(--accent-orange);"></i>
-                        <span class="player-title" id="playerTitle">Select stream</span>
-                    </div>
-                </div>
-            </div>
-            <div class="grid-header">
-                <div class="grid-title" id="gridTitle">Streams</div>
-                <div style="font-size: 12px; color: var(--text-muted);" id="itemCount">0 items</div>
-            </div>
-            <div class="stream-grid" id="streamGrid"></div>
-        </main>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="logo">
+      <i class="fa-solid fa-satellite-dish logo-icon"></i>
+      <span>SUNSET<small>IPTV</small></span>
     </div>
 
-    <script src="app.js"></script>
+    <!-- Master Search Bar -->
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="globalSearch" placeholder="Master Search channels, movies, series...">
+      <button class="clear-search" id="clearSearchBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="nav-actions">
+      <button class="btn btn-secondary" id="updatePlaylistBtn" title="Sync & Refresh Content">
+        <i class="fa-solid fa-rotate-right" id="updateIcon"></i>
+        <span>Refresh</span>
+      </button>
+      <button class="btn btn-primary" id="loginModalBtn">
+        <i class="fa-solid fa-user-gear"></i>
+        <span id="accountStatus">Sunset Login</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Tab Bar -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" data-tab="live">
+      <i class="fa-solid fa-tv"></i> Live TV
+    </button>
+    <button class="tab-btn" data-tab="movies">
+      <i class="fa-solid fa-film"></i> Movies (VOD)
+    </button>
+    <button class="tab-btn" data-tab="series">
+      <i class="fa-solid fa-clapperboard"></i> Series
+    </button>
+    <button class="tab-btn" data-tab="settings">
+      <i class="fa-solid fa-gear"></i> Settings
+    </button>
+  </nav>
+
+  <!-- Main Workspace -->
+  <main class="main-workspace">
+    
+    <!-- Left Sidebar: Category List -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span id="categoryTitle">Categories</span>
+        <span class="badge" id="categoryCount">0</span>
+      </div>
+      <ul class="category-list" id="categoryList">
+        <!-- Categories injected dynamically -->
+      </ul>
+    </aside>
+
+    <!-- Right Workspace Content -->
+    <section class="content-area">
+      
+      <!-- Video Player View Container -->
+      <div class="player-container hidden" id="playerContainer">
+        <div class="player-header">
+          <span id="currentStreamTitle">Stream Name</span>
+          <button class="close-player-btn" id="closePlayerBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="video-wrapper">
+          <video id="videoPlayer" controls autoplay></video>
+        </div>
+      </div>
+
+      <!-- Master Search Results Container -->
+      <div id="searchResultsSection" class="hidden">
+        <h3 class="section-title">Search Results</h3>
+        <div class="media-grid" id="searchResultsGrid"></div>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div id="tabContent">
+        <div id="contentHeader" class="content-header">
+          <h2 id="activeCategoryName">All Categories</h2>
+          <div id="streamCount" class="badge">0 Channels</div>
+        </div>
+        <div class="media-grid" id="mediaGrid">
+          <!-- Streams loaded here -->
+        </div>
+      </div>
+
+      <!-- Settings Dashboard -->
+      <div id="settingsTab" class="settings-view hidden">
+        <h2><i class="fa-solid fa-sliders"></i> Sunset IPTV Profile & Settings</h2>
+        
+        <div class="settings-group">
+          <h3><i class="fa-solid fa-server"></i> Server Connection Info</h3>
+          <div class="info-card" id="profileInfo">
+            <p><strong>Status:</strong> <span id="infoStatus" style="color:var(--accent-red);">Not Connected</span></p>
+            <p><strong>Server URL:</strong> <span id="infoUrl">N/A</span></p>
+            <p><strong>Username:</strong> <span id="infoUser">N/A</span></p>
+            <p><strong>Expiration:</strong> <span id="infoExp">N/A</span></p>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3><i class="fa-solid fa-sliders"></i> Player Engine</h3>
+          <div class="setting-row">
+            <label for="playerEngine">Preferred Format</label>
+            <select id="playerEngine">
+              <option value="ts">MPEG-TS (.ts) - Recommended for Live TV</option>
+              <option value="m3u8">HLS (.m3u8) - High Compatibility</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3><i class="fa-solid fa-database"></i> Session Management</h3>
+          <button class="btn btn-secondary" id="clearCacheBtn">
+            <i class="fa-solid fa-trash-can"></i> Log Out & Clear Credentials
+          </button>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Login Modal -->
+  <div class="modal-overlay hidden" id="loginModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-right-to-bracket"></i> Sunset IPTV Login</h3>
+        <button class="close-modal" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Profile Name</label>
+          <input type="text" id="profileName" value="Sunset IPTV" placeholder="Sunset IPTV">
+        </div>
+        <div class="form-group">
+          <label>Server URL (from email)</label>
+          <input type="url" id="serverUrl" placeholder="http://line.server.com:8080" required>
+        </div>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="username" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="loadDemoBtn">Demo Mode</button>
+          <button type="submit" class="btn btn-primary">Connect</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
