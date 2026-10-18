@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sunset IPTV Web Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <header class="top-navbar">
+        <div class="brand-container">
+            <div class="brand-logo"><i class="fa-solid fa-sun"></i></div>
+            <div class="brand-title">SUNSET IPTV</div>
+        </div>
+        <div class="search-bar">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="masterSearch" placeholder="Search streams...">
+        </div>
+        <div class="top-actions">
+            <button class="btn-icon" id="btnRefresh" title="Refresh"><i class="fa-solid fa-rotate-right"></i></button>
+            <button class="btn-icon" id="btnSettings" title="Settings"><i class="fa-solid fa-gear"></i></button>
+            <button class="btn-icon" id="btnLogin" title="Account Login"><i class="fa-solid fa-user"></i></button>
+        </div>
+    </header>
+
+    <div class="app-body">
+        <nav class="navigation-tabs">
+            <div class="nav-tab active" data-tab="live"><i class="fa-solid fa-tv"></i><span>Live TV</span></div>
+            <div class="nav-tab" data-tab="movies"><i class="fa-solid fa-film"></i><span>Movies</span></div>
+            <div class="nav-tab" data-tab="series"><i class="fa-solid fa-clapperboard"></i><span>Series</span></div>
+        </nav>
+
+        <aside class="category-sidebar">
+            <div class="sidebar-header">Categories</div>
+            <div class="category-list" id="categoryList"></div>
+        </aside>
+
+        <main class="content-area">
+            <div class="player-view" id="playerView">
+                <div class="video-container">
+                    <video id="videoPlayer" controls autoplay></video>
+                    <div class="player-overlay">
+                        <i class="fa-solid fa-circle-play" style="color: var(--accent-orange);"></i>
+                        <span class="player-title" id="playerTitle">Select stream</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-header">
+                <div class="grid-title" id="gridTitle">Streams</div>
+                <div style="font-size: 12px; color: var(--text-muted);" id="itemCount">0 items</div>
+            </div>
+            <div class="stream-grid" id="streamGrid"></div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
